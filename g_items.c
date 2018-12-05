@@ -1069,7 +1069,8 @@ void SpawnItem (edict_t *ent, gitem_t *item)
 			{
 				G_FreeEdict (ent);
 				return;
-			}
+			} //so you change adrenaline to ur class and then dupicate it so that this works for both
+			//give (class name) in quake 2 to give the player the abilities
 		}
 		if ( (int)dmflags->value & DF_NO_HEALTH )
 		{

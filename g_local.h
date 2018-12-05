@@ -843,6 +843,7 @@ typedef struct
 	int			game_helpchanged;
 	int			helpchanged;
 
+
 	qboolean	spectator;			// client is a spectator
 } client_persistant_t;
 
