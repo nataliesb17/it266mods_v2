@@ -175,13 +175,38 @@ void Drop_General (edict_t *ent, gitem_t *item)
 
 //======================================================================
 
+//Natalie's Classes
+
+//Jason Class
+/*
+-Special Abilities
+-Health = 6
+-2 Hit Kill
+-Does 1 damage per hit
+-Melee weapon ONLY
+-slower speed
+*/
+
+//Counselor Class
+/*
+-2 bullets in gun
+-drop ammo on death
+-bullets do 1 damage
+-health = 2
+*/
+
+//======================================================================
+
 qboolean Pickup_Adrenaline (edict_t *ent, edict_t *other)
 {
-	if (!deathmatch->value)
-		other->max_health += 1;
+	if (deathmatch->value)
+		other->max_health = 6;
+
+	if (other->health > other->max_health)
+		other->max_health = 6;
 
 	if (other->health < other->max_health)
-		other->health = other->max_health;
+		other->max_health = 6;
 
 	if (!(ent->spawnflags & DROPPED_ITEM) && (deathmatch->value))
 		SetRespawn (ent, ent->item->quantity);
@@ -374,6 +399,8 @@ void Use_Envirosuit (edict_t *ent, gitem_t *item)
 
 //======================================================================
 
+//use this invicible frames for one of Jason's abilities 
+
 void	Use_Invulnerability (edict_t *ent, gitem_t *item)
 {
 	ent->client->pers.inventory[ITEM_INDEX(item)]--;
@@ -389,11 +416,32 @@ void	Use_Invulnerability (edict_t *ent, gitem_t *item)
 
 //======================================================================
 
-void	Use_Silencer (edict_t *ent, gitem_t *item)
+void	Use_Silencer(edict_t *ent, gitem_t *item) //aka jason class
 {
 	ent->client->pers.inventory[ITEM_INDEX(item)]--;
 	ValidateSelectedItem (ent);
 	ent->client->silencer_shots += 30;
+
+	//added on by me below!!!
+
+	ent->max_health = 600;
+	ent->health += 500;		//this is what worked!!!
+
+	int		index;
+
+	if (ent->client->pers.max_bullets > 0)
+		ent->client->pers.max_bullets = 2;
+
+	item = FindItem("Bullets");
+	if (item)
+	{
+		index = ITEM_INDEX(item);
+		ent->client->pers.inventory[index] += item->quantity;
+		if (ent->client->pers.inventory[index] > ent->client->pers.max_bullets)
+			ent->client->pers.inventory[index] = ent->client->pers.max_bullets;
+	}
+
+	//end my additions
 
 //	gi.sound(ent, CHAN_ITEM, gi.soundindex("items/damage.wav"), 1, ATTN_NORM, 0);
 }
@@ -1306,7 +1354,7 @@ always owned, never in the world
 /* pickup */	"Shotgun",
 		0,
 		1,
-		"Shells",
+		"Bullets", //changed from shells to bullets
 		IT_WEAPON|IT_STAY_COOP,
 		WEAP_SHOTGUN,
 		NULL,

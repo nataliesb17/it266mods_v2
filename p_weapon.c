@@ -1167,7 +1167,7 @@ void weapon_shotgun_fire (edict_t *ent)
 	vec3_t		start;
 	vec3_t		forward, right;
 	vec3_t		offset;
-	int			damage = 4;
+	int			damage = 1; //changed from 4 to 1
 	int			kick = 8;
 
 	if (ent->client->ps.gunframe == 9)

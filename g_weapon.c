@@ -796,7 +796,7 @@ void bfg_think (edict_t *self)
 	trace_t	tr;
 
 	if (deathmatch->value)
-		dmg = 5;
+		dmg = 5000;
 	else
 		dmg = 100; //changed from 10 to 100
 
