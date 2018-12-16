@@ -541,7 +541,63 @@ void fire_grenade2 (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int 
 	}
 }
 
+/*
+=================
+punching/melee
+=================
+*/
 
+void fire_punch(edict_t *self, vec3_t start, vec3_t aim, int reach, int damage, int kick, int quiet, int mod)
+{
+	vec3_t		forward, right, up;
+	vec3_t		v;
+	vec3_t		point;
+	trace_t		tr;
+
+	vectoangles(aim, v);                   //
+	AngleVectors(v, forward, right, up);    //
+	VectorNormalize(forward);               //
+	VectorMA(start, reach, forward, point); // Aiming stuff
+
+		//see if the hit connects
+	tr = gi.trace(start, NULL, NULL, point, self, MASK_SHOT);
+	if (tr.fraction == 1.0)
+	{
+		if (!quiet) //not needed, it's better to follow my later steps
+			//gi.sound (self, CHAN_WEAPON, gi.soundindex ("weapons/swish.wav"), 1, ATTN_NORM, 0)
+			return;
+	}
+
+	if (tr.ent->takedamage == DAMAGE_YES || tr.ent->takedamage == DAMAGE_AIM) // Make sure they took damage
+	{
+		// pull the player forward if you do damage
+		VectorMA(self->velocity, 75, forward, self->velocity); // Pull forward
+		VectorMA(self->velocity, 75, up, self->velocity); // Pull up a tad bit. You can't slide&#59)
+
+			// do the damage
+			// FIXME - make the damage appear at right spot and direction
+		T_Damage(tr.ent, self, self, vec3_origin, tr.ent->s.origin, vec3_origin, damage, kick / 2, DAMAGE_ENERGY, mod); // Time to Slice my friends
+		gi.sound(self, CHAN_WEAPON, gi.soundindex("weapons/phitw1.wav"), 1, ATTN_IDLE, 0); // Used for my Punch. 
+			
+
+		if (!quiet)
+			gi.sound(self, CHAN_WEAPON, gi.soundindex("weapons/meatht.wav"), 1, ATTN_NORM, 0); // Don't change this. 
+			//This is only used if your weapon is not quiet.. Chainfist isn't quiet, knife is
+	}
+	else
+	{
+		if (!quiet)
+			gi.sound(self, CHAN_WEAPON, gi.soundindex("weapons/tink1.wav"), 1, ATTN_NORM, 0); 
+
+		VectorScale(tr.plane.normal, 256, point);
+		gi.WriteByte(svc_temp_entity);
+		gi.WriteByte(TE_SPARKS); 
+		gi.WritePosition(tr.endpos);
+		gi.WriteDir(point);
+		gi.multicast(tr.endpos, MULTICAST_PVS);
+		gi.sound(self, CHAN_AUTO, gi.soundindex("weapons/phitw2.wav"), 1, ATTN_NORM, 0);  
+	}
+}
 /*
 =================
 fire_rocket
@@ -636,7 +692,7 @@ void fire_rocket (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed
 fire_rail
 =================
 */
-void fire_rail (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int kick)
+void fire_rail(edict_t *self, vec3_t start, vec3_t aimdir, int damage, int kick)
 {
 	vec3_t		from;
 	vec3_t		end;
@@ -645,18 +701,18 @@ void fire_rail (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int kick
 	int			mask;
 	qboolean	water;
 
-	VectorMA (start, 8192, aimdir, end);
-	VectorCopy (start, from);
+	VectorMA(start, 8192, aimdir, end);
+	VectorCopy(start, from);
 	ignore = self;
 	water = false;
-	mask = MASK_SHOT|CONTENTS_SLIME|CONTENTS_LAVA;
+	mask = MASK_SHOT | CONTENTS_SLIME | CONTENTS_LAVA;
 	while (ignore)
 	{
-		tr = gi.trace (from, NULL, NULL, end, ignore, mask);
+		tr = gi.trace(from, NULL, NULL, end, ignore, mask);
 
-		if (tr.contents & (CONTENTS_SLIME|CONTENTS_LAVA))
+		if (tr.contents & (CONTENTS_SLIME | CONTENTS_LAVA))
 		{
-			mask &= ~(CONTENTS_SLIME|CONTENTS_LAVA);
+			mask &= ~(CONTENTS_SLIME | CONTENTS_LAVA);
 			water = true;
 		}
 		else
@@ -669,26 +725,26 @@ void fire_rail (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int kick
 				ignore = NULL;
 
 			if ((tr.ent != self) && (tr.ent->takedamage))
-				T_Damage (tr.ent, self, self, aimdir, tr.endpos, tr.plane.normal, damage, kick, 0, MOD_RAILGUN);
+				T_Damage(tr.ent, self, self, aimdir, tr.endpos, tr.plane.normal, damage, kick, 0, MOD_RAILGUN);
 		}
 
-		VectorCopy (tr.endpos, from);
+		VectorCopy(tr.endpos, from);
 	}
 
 	// send gun puff / flash
-	gi.WriteByte (svc_temp_entity);
-	gi.WriteByte (TE_RAILTRAIL);
-	gi.WritePosition (start);
-	gi.WritePosition (tr.endpos);
-	gi.multicast (self->s.origin, MULTICAST_PHS);
-//	gi.multicast (start, MULTICAST_PHS);
+	gi.WriteByte(svc_temp_entity);
+	gi.WriteByte(TE_RAILTRAIL);
+	gi.WritePosition(start);
+	gi.WritePosition(tr.endpos);
+	gi.multicast(self->s.origin, MULTICAST_PHS);
+	//	gi.multicast (start, MULTICAST_PHS);
 	if (water)
 	{
-		gi.WriteByte (svc_temp_entity);
-		gi.WriteByte (TE_RAILTRAIL);
-		gi.WritePosition (start);
-		gi.WritePosition (tr.endpos);
-		gi.multicast (tr.endpos, MULTICAST_PHS);
+		gi.WriteByte(svc_temp_entity);
+		gi.WriteByte(TE_RAILTRAIL);
+		gi.WritePosition(start);
+		gi.WritePosition(tr.endpos);
+		gi.multicast(tr.endpos, MULTICAST_PHS);
 	}
 
 	if (self->client)
