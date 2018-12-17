@@ -416,7 +416,7 @@ void	Use_Invulnerability (edict_t *ent, gitem_t *item) //aka jason class
 	ValidateSelectedItem(ent);
 
 	ent->max_health = 600;
-	ent->health += 600;
+	ent->health = 600;
 
 	int		index;
 
@@ -473,7 +473,7 @@ void	Use_Silencer(edict_t *ent, gitem_t *item) //aka counselor class
 	//added on by me below!!!
 
 	ent->max_health = 200;
-	ent->health += 200;		//this is what worked!!!
+	ent->health = 200;		//this is what worked!!!
 
 	int		index;
 
@@ -688,7 +688,7 @@ qboolean Pickup_Health (edict_t *ent, edict_t *other)
 		if (!(ent->spawnflags & DROPPED_ITEM) && (deathmatch->value))
 			SetRespawn (ent, 30);
 	}
-
+	
 	return true;
 }
 

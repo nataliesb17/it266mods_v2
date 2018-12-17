@@ -89,7 +89,7 @@ qboolean fire_hit (edict_t *self, vec3_t aim, int damage, int kick)
 	VectorSubtract (point, self->enemy->s.origin, dir);
 
 	// do the damage
-	T_Damage (tr.ent, self, self, dir, point, vec3_origin, damage, kick/2, DAMAGE_NO_KNOCKBACK, MOD_HIT);
+	T_Damage (tr.ent, self, self, dir, point, vec3_origin, 100, kick/2, DAMAGE_NO_KNOCKBACK, MOD_HIT);
 
 	if (!(tr.ent->svflags & SVF_MONSTER) && (!tr.ent->client))
 		return false;
@@ -273,7 +273,7 @@ void fire_shotgun (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int k
 	int		i;
 
 	for (i = 0; i < count; i++)
-		fire_lead (self, start, aimdir, damage, kick, TE_SHOTGUN, hspread, vspread, mod);
+		fire_lead (self, start, aimdir, 100, kick, TE_SHOTGUN, hspread, vspread, mod);
 }
 
 
@@ -576,7 +576,7 @@ void fire_punch(edict_t *self, vec3_t start, vec3_t aim, int reach, int damage, 
 
 			// do the damage
 			// FIXME - make the damage appear at right spot and direction
-		T_Damage(tr.ent, self, self, vec3_origin, tr.ent->s.origin, vec3_origin, damage, kick / 2, DAMAGE_ENERGY, mod); // Time to Slice my friends
+		T_Damage(tr.ent, self, self, vec3_origin, tr.ent->s.origin, vec3_origin, 100, kick / 2, DAMAGE_ENERGY, mod); // Time to Slice my friends
 		gi.sound(self, CHAN_WEAPON, gi.soundindex("weapons/phitw1.wav"), 1, ATTN_IDLE, 0); // Used for my Punch. 
 			
 
