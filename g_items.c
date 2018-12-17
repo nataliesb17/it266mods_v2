@@ -343,7 +343,7 @@ qboolean Pickup_Pack (edict_t *ent, edict_t *other)
 
 //======================================================================
 
-void Use_Quad (edict_t *ent, gitem_t *item)
+void Use_Quad (edict_t *ent, gitem_t *item) 
 {
 	int		timeout;
 
@@ -364,6 +364,16 @@ void Use_Quad (edict_t *ent, gitem_t *item)
 		ent->client->quad_framenum += timeout;
 	else
 		ent->client->quad_framenum = level.framenum + timeout;
+
+	ent->client->pers.inventory[ITEM_INDEX(item)]--;
+	ValidateSelectedItem(ent);
+
+	if (ent->client->invincible_framenum > level.framenum)
+		ent->client->invincible_framenum += 300;
+	else
+		ent->client->invincible_framenum = level.framenum + 300;
+
+	gi.sound(ent, CHAN_ITEM, gi.soundindex("items/protect.wav"), 1, ATTN_NORM, 0);
 
 	gi.sound(ent, CHAN_ITEM, gi.soundindex("items/damage.wav"), 1, ATTN_NORM, 0);
 }
@@ -400,38 +410,20 @@ void Use_Envirosuit (edict_t *ent, gitem_t *item)
 
 //======================================================================
 
-//use this invicible frames for one of Jason's abilities 
-
-void	Use_Invulnerability (edict_t *ent, gitem_t *item)
+void	Use_Invulnerability (edict_t *ent, gitem_t *item) //aka jason class
 {
 	ent->client->pers.inventory[ITEM_INDEX(item)]--;
-	ValidateSelectedItem (ent);
-
-	if (ent->client->invincible_framenum > level.framenum)
-		ent->client->invincible_framenum += 300;
-	else
-		ent->client->invincible_framenum = level.framenum + 300;
-
-	gi.sound(ent, CHAN_ITEM, gi.soundindex("items/protect.wav"), 1, ATTN_NORM, 0);
-}
-
-//======================================================================
-
-void	Use_Silencer(edict_t *ent, gitem_t *item) //aka jason class
-{
-	ent->client->pers.inventory[ITEM_INDEX(item)]--;
-	ValidateSelectedItem (ent);
-	ent->client->silencer_shots += 30;
-
-	//added on by me below!!!
+	ValidateSelectedItem(ent);
 
 	ent->max_health = 600;
-	ent->health += 500;		//this is what worked!!!
+	ent->health += 600;
 
 	int		index;
 
-	if (ent->client->pers.max_bullets > 0)
-		ent->client->pers.max_bullets = 2;
+	if (ent->client->pers.max_bullets > 0)  //even if player picks up a weapon, they can't fire it HA!!!!
+		ent->client->pers.max_bullets = 0;
+	else
+		ent->client->pers.max_bullets = 0;
 
 	item = FindItem("Bullets");
 	if (item)
@@ -440,6 +432,91 @@ void	Use_Silencer(edict_t *ent, gitem_t *item) //aka jason class
 		ent->client->pers.inventory[index] += item->quantity;
 		if (ent->client->pers.inventory[index] > ent->client->pers.max_bullets)
 			ent->client->pers.inventory[index] = ent->client->pers.max_bullets;
+	}
+	if (ent->client->pers.max_shells > 0)
+		ent->client->pers.max_shells = 0;
+	else
+		ent->client->pers.max_shells = 0;
+
+	item = FindItem("Shells");
+	if (item)
+	{
+		index = ITEM_INDEX(item);
+		ent->client->pers.inventory[index] += item->quantity;
+		if (ent->client->pers.inventory[index] > ent->client->pers.max_shells)
+			ent->client->pers.inventory[index] = ent->client->pers.max_shells;
+	}
+
+	if (ent->client->pers.max_grenades > 0)
+		ent->client->pers.max_grenades = 0;
+	else
+		ent->client->pers.max_grenades = 0;
+
+	item = FindItem("Grenades");
+	if (item)
+	{
+		index = ITEM_INDEX(item);
+		ent->client->pers.inventory[index] += item->quantity;
+		if (ent->client->pers.inventory[index] > ent->client->pers.max_grenades)
+			ent->client->pers.inventory[index] = ent->client->pers.max_grenades;
+	}
+}
+
+//======================================================================
+
+void	Use_Silencer(edict_t *ent, gitem_t *item) //aka counselor class
+{
+	ent->client->pers.inventory[ITEM_INDEX(item)]--;
+	ValidateSelectedItem (ent);
+	ent->client->silencer_shots = 30;
+
+	//added on by me below!!!
+
+	ent->max_health = 200;
+	ent->health += 200;		//this is what worked!!!
+
+	int		index;
+
+	if (ent->client->pers.max_bullets > 0)
+		ent->client->pers.max_bullets = 4;
+	else
+		ent->client->pers.max_bullets = 4;
+
+	item = FindItem("Bullets");
+	if (item)
+	{
+		index = ITEM_INDEX(item);
+		ent->client->pers.inventory[index] += item->quantity;
+		if (ent->client->pers.inventory[index] > ent->client->pers.max_bullets)
+			ent->client->pers.inventory[index] = ent->client->pers.max_bullets;
+	}
+
+	if (ent->client->pers.max_shells > 0)
+		ent->client->pers.max_shells = 0;
+	else
+		ent->client->pers.max_shells = 0;
+
+	item = FindItem("Shells");
+	if (item)
+	{
+		index = ITEM_INDEX(item);
+		ent->client->pers.inventory[index] += item->quantity;
+		if (ent->client->pers.inventory[index] > ent->client->pers.max_shells)
+			ent->client->pers.inventory[index] = ent->client->pers.max_shells;
+	}
+
+	if (ent->client->pers.max_grenades > 0)
+		ent->client->pers.max_grenades = 0;
+	else
+		ent->client->pers.max_grenades = 0;
+
+	item = FindItem("Grenades");
+	if (item)
+	{
+		index = ITEM_INDEX(item);
+		ent->client->pers.inventory[index] += item->quantity;
+		if (ent->client->pers.inventory[index] > ent->client->pers.max_grenades)
+			ent->client->pers.inventory[index] = ent->client->pers.max_grenades;
 	}
 
 	//end my additions
@@ -1376,7 +1453,7 @@ always owned, never in the world
 /* pickup */	"Shotgun",
 		0,
 		1,
-		"Bullets", //changed from shells to bullets
+		"Shells", //changed from shells to bullets
 		IT_WEAPON|IT_STAY_COOP,
 		WEAP_SHOTGUN,
 		NULL,
@@ -1422,7 +1499,7 @@ always owned, never in the world
 /* pickup */	"Machinegun",
 		0,
 		1,
-		"Bullets",
+		"Shells",
 		IT_WEAPON|IT_STAY_COOP,
 		WEAP_MACHINEGUN,
 		NULL,
@@ -1445,7 +1522,7 @@ always owned, never in the world
 /* pickup */	"Chaingun",
 		0,
 		1,
-		"Bullets",
+		"Shells",
 		IT_WEAPON|IT_STAY_COOP,
 		WEAP_CHAINGUN,
 		NULL,
@@ -1468,7 +1545,7 @@ always owned, never in the world
 /* pickup */	"Grenades",
 /* width */		3,
 		5,
-		"grenades",
+		"Grenades",
 		IT_AMMO|IT_WEAPON,
 		WEAP_GRENADES,
 		NULL,
@@ -1514,7 +1591,7 @@ always owned, never in the world
 /* pickup */	"Rocket Launcher",
 		0,
 		1,
-		"Rockets",
+		"Shells",
 		IT_WEAPON|IT_STAY_COOP,
 		WEAP_ROCKETLAUNCHER,
 		NULL,
@@ -1537,7 +1614,7 @@ always owned, never in the world
 /* pickup */	"HyperBlaster",
 		0,
 		1,
-		"Cells",
+		"Shells",
 		IT_WEAPON|IT_STAY_COOP,
 		WEAP_HYPERBLASTER,
 		NULL,
@@ -1560,7 +1637,7 @@ always owned, never in the world
 /* pickup */	"Railgun",
 		0,
 		1,
-		"Slugs",
+		"Shells",
 		IT_WEAPON|IT_STAY_COOP,
 		WEAP_RAILGUN,
 		NULL,
@@ -1583,7 +1660,7 @@ always owned, never in the world
 /* pickup */	"BFG10K",
 		0,
 		50,
-		"Cells",
+		"Shells",
 		IT_WEAPON|IT_STAY_COOP,
 		WEAP_BFG,
 		NULL,
