@@ -212,6 +212,10 @@ qboolean Pickup_Adrenaline (edict_t *ent, edict_t *other)
 	if (!(ent->spawnflags & DROPPED_ITEM) && (deathmatch->value))
 		SetRespawn (ent, ent->item->quantity);
 
+	VectorClear(other->velocity);
+	other->client->ps.pmove.pm_time = 1000;		// hold time
+	other->client->ps.pmove.pm_flags |= PMF_TIME_TELEPORT;
+
 	return true;
 }
 
@@ -664,35 +668,11 @@ void MegaHealth_think (edict_t *self)
 		G_FreeEdict (self);
 }
 
-qboolean Pickup_Health (edict_t *ent, edict_t *other)
+qboolean Pickup_Health (edict_t *ent, edict_t *other) //AKA TRAPS 
 {
-	if (!(ent->style & HEALTH_IGNORE_MAX))
-		if (other->health >= other->max_health)
-			return false;
-
-	other->health += ent->count;
-
-	if (!(ent->style & HEALTH_IGNORE_MAX))
-	{
-		if (other->health > other->max_health)
-			other->health = other->max_health;
-	}
-
-	if (ent->style & HEALTH_TIMED)
-	{
-		ent->think = MegaHealth_think;
-		ent->nextthink = level.time + 5;
-		ent->owner = other;
-		ent->flags |= FL_RESPAWN;
-		ent->svflags |= SVF_NOCLIENT;
-		ent->solid = SOLID_NOT;
-	}
-	else
-	{
-		if (!(ent->spawnflags & DROPPED_ITEM) && (deathmatch->value))
-			SetRespawn (ent, 30);
-	}
-	
+	VectorClear(other->velocity);
+	other->client->ps.pmove.pm_time = 1000;		// hold time
+	other->client->ps.pmove.pm_flags |= PMF_TIME_TELEPORT;
 	return true;
 }
 
