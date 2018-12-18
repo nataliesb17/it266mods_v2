@@ -677,6 +677,24 @@ char *single_statusbar =
 "	pic	9 "
 "endif "
 
+// timer2			// New
+"if 16 "			// New. If STAT_TIMER2_ICON is not zero, then do
+"	yb	-48 "		// New
+"	xr	-58 "		// New
+"	num	2	17 "	// New. Display 2-digits with value from stat-array at index 17
+"	xr	-24 "		// New
+"	pic	16 "		// New. Display icon
+"endif "			// New
+
+// timer3			// New
+"if 18 "			// New. If STAT_TIMER3_ICON is not zero, then do
+"	yb	-72 "		// New
+"	xr	-58 "		// New
+"	num	2	19 "	// New. Display 2-digits with value from stat-array at index 19
+"	xr	-24 "		// New
+"	pic	18 "		// New. Display icon
+"endif "			// New
+
 //  help / weapon icon 
 "if 11 "
 "	xv	148 "
@@ -688,24 +706,24 @@ char *dm_statusbar =
 "yb	-24 "
 
 // health
-"xv	0 "
+"xv	-200 " //original 0
 "hnum "
-"xv	50 "
+"xv	-150 " //original 50
 "pic 0 "
 
 // ammo
 "if 2 "
-"	xv	100 "
+"	xv	-140" //original 100
 "	anum "
-"	xv	150 "
+"	xv	-90 " //original 150
 "	pic 2 "
 "endif "
 
 // armor
 "if 4 "
-"	xv	200 "
+"	xv	100 " //original 200
 "	rnum "
-"	xv	250 "
+"	xv	150 " //original 250
 "	pic 4 "
 "endif "
 
@@ -737,7 +755,7 @@ char *dm_statusbar =
 
 //  help / weapon icon 
 "if 11 "
-"	xv	148 "
+"	xv	-250 " //original 148
 "	pic	11 "
 "endif "
 
