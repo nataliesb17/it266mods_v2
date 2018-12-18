@@ -390,7 +390,9 @@ void Use_Breather (edict_t *ent, gitem_t *item)
 	else
 		ent->client->breather_framenum = level.framenum + 300;
 
-//	gi.sound(ent, CHAN_ITEM, gi.soundindex("items/damage.wav"), 1, ATTN_NORM, 0);
+	
+
+	
 }
 
 //======================================================================
@@ -460,6 +462,8 @@ void	Use_Invulnerability (edict_t *ent, gitem_t *item) //aka jason class
 		if (ent->client->pers.inventory[index] > ent->client->pers.max_grenades)
 			ent->client->pers.inventory[index] = ent->client->pers.max_grenades;
 	}
+
+	gi.sound(ent, CHAN_ITEM, gi.soundindex("items/death4.wav"), 1, ATTN_NORM, 0);
 }
 
 //======================================================================
